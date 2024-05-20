@@ -34,11 +34,10 @@ jaf
 ===
 
 
-    Add a short description here!
+    A script to create a list of email addreses and project acronymns from a research funding list
 
 
-A longer description of your project goes here...
-
+    A script to create a list of email addreses and project acronymns from a research funding list
 
 .. _pyscaffold-notes:
 
