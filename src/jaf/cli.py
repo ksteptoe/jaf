@@ -5,7 +5,9 @@ which will install the command $(package) inside your current environment.
 
 import logging
 import click
-from .api import jaf_api
+from ResearchFrame import ResearchFrame
+from pathlib import Path
+import yaml
 
 __author__ = "Kevin Steptoe"
 __copyright__ = "Kevin Steptoe"
@@ -17,27 +19,23 @@ _logger = logging.getLogger(__name__)
 
 
 @click.command()
-@click.version_option(__version__, '--version')
-@click.argument('n', type=int)
-@click.option('-v', '--verbose', 'loglevel', type=int, flag_value=logging.INFO)
-@click.option('-vv', '--very_verbose', 'loglevel', type=int, flag_value=logging.DEBUG)
-def cli(n, loglevel):
-    """Calls :func:`main` passing the CLI arguments extracted from click
-
-    This function can be used as entry point to create console scripts with setuptools.
+@click.argument('input', type=click.Path(exists=True))
+@click.version_option(version=__version__, prog_name="insight")
+def cli(input: str) -> None:
     """
-    jaf_api(n, loglevel)
+    Analyze Excel sheets from MailChimp and insightly sources.
+
+    Args:
+        input: Input Excel files to analyze.
+
+    """
+    config = Path("template.yml")
+    with open(config, 'r') as file:
+        email_templates = yaml.safe_load(file)
+    rf = ResearchFrame(email_templates, input)
+    print(rf)
 
 
 if __name__ == "__main__":
-    # ^  This is a guard statement that will prevent the following code from
-    #    being executed in the case someone imports this file instead of
-    #    executing it as a script.
-    #    https://docs.python.org/3/library/__main__.html
 
-    # After installing your project with pip, users can also run this Python
-    # modules as scripts via the ``-m`` flag, as defined in PEP 338::
-    #
-    #     python -m jaf.jaf 42
-    #
     cli()
