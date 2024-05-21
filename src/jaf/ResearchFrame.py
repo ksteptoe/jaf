@@ -24,28 +24,28 @@ def generate_email(first_name, last_name, institution, templates):
 
 
 class ResearchFrame:
-    def __init__(self, templates, file):
-        input_df = pd.read_excel(file, sheet_name='Table1')
+    def __init__(self, input, output, templates, sheet):
+        self.sheet = sheet
+        self.input_df = pd.read_excel(input, sheet_name=self.sheet)
+        self.output = output
         self.templates = templates
-        self.df = input_df
-
-        df = self.df[['LeadROName', 'PISurname', 'PIFirstName', 'Title']].copy()
+        self.df = self.input_df[['LeadROName', 'PISurname', 'PIFirstName', 'Title']].copy()
 
         # Generate email addresses
-        df.loc[:, 'Email'] = df.apply(
+        self.df.loc[:, 'Email'] = self.df.apply(
             lambda row: generate_email(row['PIFirstName'], row['PISurname'], row['LeadROName'], self.templates),
             axis=1)
 
         # Condense the project title using the condense_title function
-        df.loc[:, 'CondensedTitle'] = df['Title'].apply(condense_title)
-        # Select the relevant columns for the output
-        output_df = df[['LeadROName', 'PISurname', 'PIFirstName', 'Title', 'Email', 'CondensedTitle']]
+        self.df.loc[:, 'CondensedTitle'] = self.df['Title'].apply(condense_title)
 
-        # Save the processed data into a new spreadsheet
-        output_file = 'processed_research_projects.xlsx'  # Update this to your output file
-        output_df.to_excel(output_file, index=False)
+        # Select the relevant columns
+        self.df = self.df[['LeadROName', 'PISurname', 'PIFirstName', 'Email', 'CondensedTitle']]
 
-        print("Processing complete. Output saved to", output_file)
+    def output_xl(self):
+
+        self.df.to_excel(self.output, index=False)
+        print("Processing complete. Output saved to", self.output)
 
 
 
