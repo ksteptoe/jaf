@@ -1,5 +1,15 @@
 # ResearchFrame Class
 import pandas as pd
+import re
+
+
+def condense_title(title):
+    acronyms = re.findall(r'\b[A-Z]{2,}\b', title)
+    if acronyms:
+        condensed_title = ' '.join(acronyms)  # Join acronyms with spaces
+    else:
+        condensed_title = title  # Use the full title if no acronyms are found
+    return condensed_title
 
 
 # Function to generate email addresses
@@ -26,10 +36,16 @@ class ResearchFrame:
             lambda row: generate_email(row['PIFirstName'], row['PISurname'], row['LeadROName'], self.templates),
             axis=1)
 
-        # Condense the project title if necessary (for example, by trimming)
-        df['CondensedTitle'] = df['Title'].str.strip()
+        # Condense the project title using the condense_title function
+        df.loc[:, 'CondensedTitle'] = df['Title'].apply(condense_title)
+        # Select the relevant columns for the output
+        output_df = df[['LeadROName', 'PISurname', 'PIFirstName', 'Title', 'Email', 'CondensedTitle']]
 
-    def guess_email(self, row):
-        return self.email_pattern[row['LeadROName']]
+        # Save the processed data into a new spreadsheet
+        output_file = 'processed_research_projects.xlsx'  # Update this to your output file
+        output_df.to_excel(output_file, index=False)
+
+        print("Processing complete. Output saved to", output_file)
+
 
 
