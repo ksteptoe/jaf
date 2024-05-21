@@ -19,9 +19,14 @@ _logger = logging.getLogger(__name__)
 
 
 @click.command()
-@click.argument('input', type=click.Path(exists=True))
+@click.command()
+@click.argument('input', type=click.Path(exists=True), help="Input file path (must exist).")
+@click.argument('output', type=click.Path(), required=False, default='output.xlsx',
+                help="Output file path (defaults to 'output.xlsx' if not provided).")
+@click.option('-t', '--template', type=click.Path(), default='template.yml',
+              help='Template file path (defaults to "template.yml").')
 @click.version_option(version=__version__, prog_name="insight")
-def cli(input: str) -> None:
+def cli(input: str, output: str, template: str) -> None:
     """
     Analyze Excel sheets from MailChimp and insightly sources.
 
@@ -33,7 +38,6 @@ def cli(input: str) -> None:
     with open(config, 'r') as file:
         email_templates = yaml.safe_load(file)
     rf = ResearchFrame(email_templates, input)
-    print(rf)
 
 
 if __name__ == "__main__":
